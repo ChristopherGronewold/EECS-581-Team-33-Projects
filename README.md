@@ -2,8 +2,8 @@
 
 ## Team Members
 
-Ethan Dirkes
-Chase Entwistle
-Christopher Gronewold
-Tommy Lam
+Ethan Dirkes,
+Chase Entwistle,
+Christopher Gronewold,
+Tommy Lam,
 Zonaid Prithu
