@@ -56,8 +56,10 @@ def start_screen():
 
         pygame.display.flip()
 
+finished = False
+
 def placement_screen(player):
-    global player1_ships, player2_ships
+    global player1_ships, player2_ships, finished
     grid = [[0] * 10 for _ in range(10)]
     # Create ship rectangles of different sizes based on the number of ships
     ships = [pygame.Rect(600, 100 + i * 60, (i + 1) * 50, 50) for i in range(num_ships)]
@@ -109,7 +111,7 @@ def placement_screen(player):
         draw_button(rotate_text, 600, 600, 150, 50, LIGHT_GRAY, lambda: globals().update(vertical=not vertical))
 
         all_ships_placed = all(ship.left < 600 for ship in ships)
-        draw_button("Finish", 800, 600, 150, 50, LIGHT_GRAY, lambda: globals().update(finished=True),
+        draw_button("Finish", 800, 600, 150, 50, LIGHT_GRAY, lambda: 0,
                     enabled=all_ships_placed)
 
         # Draw a red outline to show where the selected ship will be placed
@@ -174,10 +176,74 @@ def placement_screen(player):
     else:
         player2_ships = grid
 
+def pass_screen(player):
+    global finished
+    finished = False
+    while not finished:
+        screen.fill(WHITE)
+        text = font.render(f"Pass to player {player}", True, BLACK)
+        screen.blit(text, (350, 20))
+        draw_button("Finish", 400, 600, 150, 50, LIGHT_GRAY, lambda: 0)
+ 
+        # Handle events
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if 400 <= event.pos[0] <= 550 and 600 <= event.pos[1] <= 650:
+                    finished = True
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+        pygame.display.flip()
+    screen.fill(WHITE)
+
+def battle_screen(player):
+    global finished
+    finished = False
+    while not finished:
+        screen.fill(WHITE)
+        text = font.render(f"Player {player}: battle screen placeholder", True, BLACK)
+        screen.blit(text, (350, 20))
+        def on_press():
+            global finished
+            finished = True
+        draw_button("Finish", 800, 600, 150, 50, LIGHT_GRAY, on_press)
+
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if 800 <= event.pos[0] <= 950 and 600 <= event.pos[1] <= 650:
+                    finished = True
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+        pygame.display.flip()
+    screen.fill(WHITE)
+
+def winner_screen(player):
+    pass #TODO
+
+def game_over():
+    return False #TODO
+
 # Main game flow
-start_screen()
-placement_screen(1)
-placement_screen(2)
+while True:
+    start_screen()
+    placement_screen(1)
+    placement_screen(2)
+
+    winner = 0
+    while winner == 0:
+        pass_screen(1)
+        battle_screen(1)
+        if game_over():
+            winner = 1
+            break
+        pass_screen(2)
+        battle_screen(2)
+        if game_over():
+            winner = 2
+            break
+
+    winner_screen(winner)
 
 print("Player 1 ships:", player1_ships)
 print("Player 2 ships:", player2_ships)
