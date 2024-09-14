@@ -1,0 +1,2 @@
+Christopher Gronewold - 3 hours
+	We split the project into sections that each of us programmed. I coverted the screens where you select the number of ships to play with as well as the screens for ship placement. Programming this as well as collaborating with the other team members took around 3 hours.
