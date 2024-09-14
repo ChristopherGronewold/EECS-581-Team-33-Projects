@@ -1,3 +1,0 @@
-9/6 - Project foundational logic by Chase Entwistle (1 hour)
-9/7 - Creation of game settings screen and ship placement screens by Christopher Gronewold (2 hours)
-9/10 - team meeting (20 minutes)
