@@ -19,6 +19,10 @@ num_ships = 0
 player1_ships = None
 player2_ships = None
 
+# Grids to track attacks for each player
+player1_attack_grid = [[None for _ in range(10)] for _ in range(10)]
+player2_attack_grid = [[None for _ in range(10)] for _ in range(10)]
+
 def draw_button(text, x, y, w, h, color, action=None, enabled=True):
     mouse = pygame.mouse.get_pos()
     click = pygame.mouse.get_pressed()
@@ -60,8 +64,7 @@ finished = False
 
 def placement_screen(player):
     global player1_ships, player2_ships, finished
-    grid = [[0] * 10 for _ in range(10)]
-    # Create ship rectangles of different sizes based on the number of ships
+    grid = [[None] * 10 for _ in range(10)]  # Initialize the grid with None values
     ships = [pygame.Rect(600, 100 + i * 60, (i + 1) * 50, 50) for i in range(num_ships)]
     selected = None
     vertical = False
@@ -72,18 +75,18 @@ def placement_screen(player):
         for y in range(10):
             for x in range(10):
                 if grid[y][x] == ship_num:
-                    grid[y][x] = 0
+                    grid[y][x] = None
 
     def is_valid_placement(x, y, size, is_vertical, ship_num):
         # Check if a ship can be placed at the given position
         if is_vertical:
             if y + size > 10:
                 return False
-            return all(grid[y+i][x] == 0 or grid[y+i][x] == ship_num for i in range(size))
+            return all(grid[y + i][x] is None or grid[y + i][x] == ship_num for i in range(size))
         else:
             if x + size > 10:
                 return False
-            return all(grid[y][x+i] == 0 or grid[y][x+i] == ship_num for i in range(size))
+            return all(grid[y][x + i] is None or grid[y][x + i] == ship_num for i in range(size))
 
     while not finished:
         screen.fill(WHITE)
@@ -95,7 +98,7 @@ def placement_screen(player):
             for j in range(10):
                 pygame.draw.rect(screen, GRID_BLUE, (50 + i * 50, 100 + j * 50, 50, 50))
                 pygame.draw.rect(screen, BLACK, (50 + i * 50, 100 + j * 50, 50, 50), 1)
-                if grid[j][i] != 0:
+                if grid[j][i] is not None:  # If a ship is placed, color it dark gray
                     pygame.draw.rect(screen, DARK_GRAY, (50 + i * 50, 100 + j * 50, 50, 50))
                 screen.blit(font.render(chr(65 + i), True, BLACK), (65 + i * 50, 70))
                 screen.blit(font.render(str(j + 1), True, BLACK), (20, 115 + j * 50))
@@ -111,17 +114,16 @@ def placement_screen(player):
         draw_button(rotate_text, 600, 600, 150, 50, LIGHT_GRAY, lambda: globals().update(vertical=not vertical))
 
         all_ships_placed = all(ship.left < 600 for ship in ships)
-        draw_button("Finish", 800, 600, 150, 50, LIGHT_GRAY, lambda: 0,
-                    enabled=all_ships_placed)
+        draw_button("Finish", 800, 600, 150, 50, LIGHT_GRAY, lambda: 0, enabled=all_ships_placed)
 
         # Draw a red outline to show where the selected ship will be placed
         mouse_pos = pygame.mouse.get_pos()
         if selected is not None:
-            size = max(ships[selected].width, ships[selected].height)
+            size = max(ships[selected].width, ships[selected].height) // 50
             if vertical:
-                indicator = pygame.Rect(mouse_pos[0] - 25, mouse_pos[1] - 25, 50, size)
+                indicator = pygame.Rect(mouse_pos[0] - 25, mouse_pos[1] - 25, 50, size * 50)
             else:
-                indicator = pygame.Rect(mouse_pos[0] - 25, mouse_pos[1] - 25, size, 50)
+                indicator = pygame.Rect(mouse_pos[0] - 25, mouse_pos[1] - 25, size * 50, 50)
             pygame.draw.rect(screen, RED, indicator, 2)
 
         for event in pygame.event.get():
@@ -141,15 +143,12 @@ def placement_screen(player):
                             if is_valid_placement(x, y, size, vertical, selected + 1):
                                 # Place the ship on the grid
                                 clear_ship(selected + 1)
-                                if vertical:
-                                    ships[selected] = pygame.Rect(50 + x * 50, 100 + y * 50, 50, size * 50)
-                                else:
-                                    ships[selected] = pygame.Rect(50 + x * 50, 100 + y * 50, size * 50, 50)
                                 for i in range(size):
                                     if vertical:
-                                        grid[y+i][x] = selected + 1
+                                        grid[y + i][x] = 'S'  # Mark the ship with 'S'
                                     else:
-                                        grid[y][x+i] = selected + 1
+                                        grid[y][x + i] = 'S'  # Mark the ship with 'S'
+                                ships[selected] = pygame.Rect(50 + x * 50, 100 + y * 50, 50 if vertical else size * 50, size * 50 if vertical else 50)
                             selected = None
                         else:
                             # Select a ship that's already on the grid
@@ -193,57 +192,166 @@ def pass_screen(player):
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-        pygame.display.flip()
-    screen.fill(WHITE)
 
-def battle_screen(player):
+        pygame.display.flip()
+
+def battle_screen(player, opponent_grid, hits_grid):
     global finished
     finished = False
+    shot_result = None  # Track if the last shot was a hit or miss
+    attack_made = False  # Track if an attack has been made
+
     while not finished:
         screen.fill(WHITE)
-        text = font.render(f"Player {player}: battle screen placeholder", True, BLACK)
-        screen.blit(text, (350, 20))
+        text = font.render(f"Player {player}: Select a cell to attack", True, BLACK)
+        screen.blit(text, (300, 20))
+
+        # Draw the opponent's grid
+        for i in range(10):
+            for j in range(10):
+                pygame.draw.rect(screen, GRID_BLUE, (50 + i * 50, 100 + j * 50, 50, 50))
+                pygame.draw.rect(screen, BLACK, (50 + i * 50, 100 + j * 50, 50, 50), 1)
+
+                if hits_grid[j][i] == 'M':  # Missed shot
+                    pygame.draw.circle(screen, LIGHT_BLUE, (75 + i * 50, 125 + j * 50), 20, 2)
+                elif hits_grid[j][i] == 'H':  # Hit shot
+                    pygame.draw.line(screen, RED, (60 + i * 50, 110 + j * 50), (90 + i * 50, 140 + j * 50), 3)
+                    pygame.draw.line(screen, RED, (90 + i * 50, 110 + j * 50), (60 + i * 50, 140 + j * 50), 3)
+
+        # Show the result of the last shot
+        if shot_result:
+            result_text = font.render(shot_result, True, BLACK)
+            screen.blit(result_text, (400, 650))
+
+        # Draw a "Finish Turn" button
         def on_press():
             global finished
             finished = True
-        draw_button("Finish", 800, 600, 150, 50, LIGHT_GRAY, on_press)
+        draw_button("Finish Turn", 800, 600, 150, 50, LIGHT_GRAY, on_press)
 
         for event in pygame.event.get():
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if 800 <= event.pos[0] <= 950 and 600 <= event.pos[1] <= 650:
-                    finished = True
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN and not attack_made:
+                # Get the grid coordinates the player clicked on
+                x, y = (event.pos[0] - 50) // 50, (event.pos[1] - 100) // 50
+                if 0 <= x < 10 and 0 <= y < 10:
+                    # Check if this cell has already been attacked
+                    if hits_grid[y][x] is None:
+                        if opponent_grid[y][x] == 'S':  # Hit
+                            hits_grid[y][x] = 'H'
+                            opponent_grid[y][x] = 'H'
+                            shot_result = "Hit!"
+                        else:  # Miss
+                            hits_grid[y][x] = 'M'
+                            shot_result = "Miss!"
+                        attack_made = True  # Lock out further attacks
+                    else:
+                        # If the cell has already been attacked, do nothing
+                        shot_result = "Already Attacked!"
+
         pygame.display.flip()
-    screen.fill(WHITE)
+    
+    # Check for game over condition
+    def all_ships_sunk(grid):
+        for row in grid:
+            print(row)
+            if 'S' in row:  # Check if there are any ships left
+                return False
+        return True
+
+    if all_ships_sunk(opponent_grid):
+        finished = True
+        winner = 2 if player == 2 else 1
+        return winner  # Return the winner
+    else:
+        return 0  # Continue the game
 
 def winner_screen(player):
-    pass #TODO
+    screen.fill(WHITE)
+    text = font.render(f"Player {player} Wins!", True, BLACK)
+    screen.blit(text, (350, 200))
 
-def game_over():
-    return False #TODO
+    def new_game():
+        global game_running, restart_game
+        restart_game = True  # Set flag to restart the game
+        game_running = False  # Exit the current game loop
 
-# Main game flow
-while True:
-    start_screen()
-    placement_screen(1)
-    placement_screen(2)
+    def end_game():
+        pygame.quit()
+        sys.exit()
 
-    winner = 0
-    while winner == 0:
-        pass_screen(1)
-        battle_screen(1)
-        if game_over():
-            winner = 1
+    # Draw "New Game" button
+    draw_button("New Game", 300, 400, 150, 50, LIGHT_GRAY, action=new_game)
+
+    # Draw "End Game" button
+    draw_button("End Game", 500, 400, 150, 50, LIGHT_GRAY, action=end_game)
+
+    # Wait for user interaction
+    while True:
+        mouse_pos = pygame.mouse.get_pos()
+        mouse_pressed = pygame.mouse.get_pressed()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+        # Check button clicks
+        if (300 <= mouse_pos[0] <= 450 and 400 <= mouse_pos[1] <= 450) and mouse_pressed[0]:
+            new_game()
+        elif (500 <= mouse_pos[0] <= 650 and 400 <= mouse_pos[1] <= 450) and mouse_pressed[0]:
+            end_game()
+
+        pygame.display.flip()
+
+        if not game_running:
             break
+
+def main():
+    global num_ships, player1_ships, player2_ships
+    global game_running, restart_game
+
+    restart_game = False  # Flag to restart the game
+    game_running = True  # Flag to control game loop
+
+    while True:
+        if restart_game:
+            # Reset game state for a new game
+            num_ships = 0
+            player1_ships = None
+            player2_ships = None
+            main()  # Reset game to start screen
+        start_screen()
+        # Initialize hits grids for each player
+        player1_hits = [[None] * 10 for _ in range(10)]
+        player2_hits = [[None] * 10 for _ in range(10)]
+
+        # Player 1 ship placement
+        placement_screen(1)
         pass_screen(2)
-        battle_screen(2)
-        if game_over():
-            winner = 2
-            break
 
-    winner_screen(winner)
+        # Player 2 ship placement
+        placement_screen(2)
+        pass_screen(1)
 
-print("Player 1 ships:", player1_ships)
-print("Player 2 ships:", player2_ships)
+        # Start the battle
+        winner = 0
+        while winner == 0:
+            pass_screen(1)
+            winner = battle_screen(1, player2_ships, player1_hits)  # Player 1 attacks Player 2
+            if winner:
+                break
+            
+            pass_screen(2)
+            winner = battle_screen(2, player1_ships, player2_hits)  # Player 2 attacks Player 1
+            if winner:
+                break
+
+        # Display winner and wait for user action
+        winner_screen(winner)
+
+# Run the main game loop
+if __name__ == "__main__":
+    main()
