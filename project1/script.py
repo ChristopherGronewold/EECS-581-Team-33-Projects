@@ -207,6 +207,34 @@ def battle_screen(player, opponent_grid, hits_grid):
     shot_result = None  # Track if the last shot was a hit or miss
     attack_made = False  # Track if an attack has been made
 
+    def check_ship_sunk(x, y):
+        if opponent_grid[y][x] != 'H':
+            return False
+
+        # Check horizontally
+        left = x
+        while left > 0 and opponent_grid[y][left-1] in ['S', 'H']:
+            left -= 1
+        right = x
+        while right < 9 and opponent_grid[y][right+1] in ['S', 'H']:
+            right += 1
+
+        # Check vertically
+        top = y
+        while top > 0 and opponent_grid[top-1][x] in ['S', 'H']:
+            top -= 1
+        bottom = y
+        while bottom < 9 and opponent_grid[bottom+1][x] in ['S', 'H']:
+            bottom += 1
+
+        # Check if all cells in the ship are hit
+        if left != right:  # Horizontal ship
+            return all(opponent_grid[y][i] == 'H' for i in range(left, right+1))
+        elif top != bottom:  # Vertical ship
+            return all(opponent_grid[i][x] == 'H' for i in range(top, bottom+1))
+        else:  # Single cell ship
+            return True
+
     while not finished:
         screen.fill(WHITE)
         text = font.render(f"Player {player}: Select a cell to attack", True, BLACK)
@@ -219,10 +247,13 @@ def battle_screen(player, opponent_grid, hits_grid):
                 pygame.draw.rect(screen, BLACK, (50 + i * 50, 100 + j * 50, 50, 50), 1)
 
                 if hits_grid[j][i] == 'M':  # Missed shot
-                    pygame.draw.circle(screen, LIGHT_BLUE, (75 + i * 50, 125 + j * 50), 20, 2)
+                    pygame.draw.circle(screen, WHITE, (75 + i * 50, 125 + j * 50), 20, 2)
                 elif hits_grid[j][i] == 'H':  # Hit shot
-                    pygame.draw.line(screen, RED, (60 + i * 50, 110 + j * 50), (90 + i * 50, 140 + j * 50), 3)
-                    pygame.draw.line(screen, RED, (90 + i * 50, 110 + j * 50), (60 + i * 50, 140 + j * 50), 3)
+                    if check_ship_sunk(i, j):
+                        pygame.draw.rect(screen, DARK_GRAY, (50 + i * 50, 100 + j * 50, 50, 50))
+                    else:
+                        pygame.draw.line(screen, RED, (60 + i * 50, 110 + j * 50), (90 + i * 50, 140 + j * 50), 3)
+                        pygame.draw.line(screen, RED, (90 + i * 50, 110 + j * 50), (60 + i * 50, 140 + j * 50), 3)
 
         # Show the result of the last shot
         if shot_result:
@@ -248,7 +279,10 @@ def battle_screen(player, opponent_grid, hits_grid):
                         if opponent_grid[y][x] == 'S':  # Hit
                             hits_grid[y][x] = 'H'
                             opponent_grid[y][x] = 'H'
-                            shot_result = "Hit!"
+                            if check_ship_sunk(x, y):
+                                shot_result = "Sink!"
+                            else:
+                                shot_result = "Hit!"
                         else:  # Miss
                             hits_grid[y][x] = 'M'
                             shot_result = "Miss!"
