@@ -2,3 +2,4 @@
 9/7 - Creation of game settings screen and ship placement screens by Christopher Gronewold (2 hours)
 9/10 - team meeting (20 minutes)
 9/14 - Creation of End screen and attack system by Zonaid Prithu (2 hours)
+9/14 - Debugging code by Christopher Gronewold (30 minutes)
