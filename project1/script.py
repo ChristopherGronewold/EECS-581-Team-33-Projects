@@ -41,6 +41,7 @@ def draw_button(text, x, y, w, h, color, action=None, enabled=True):
         if click[0] == 1 and action is not None:
             action()
 
+# Start screen for players to select how many ships to play with
 def start_screen():
     global num_ships
     while num_ships == 0:
@@ -62,12 +63,12 @@ def start_screen():
 
 finished = False
 
-
+# Screen for each player to place their ships
 def placement_screen(player):
     global player1_ships, player2_ships, finished
     grid = [[None] * 10 for _ in range(10)]  # Initialize the grid with None values
     ships = [pygame.Rect(600, 100 + i * 60, (i + 1) * 50, 50) for i in range(num_ships)]
-    selected = None
+    selected = None # Which ship is currently selected for placement
     vertical = False
     finished = False
 
@@ -103,9 +104,9 @@ def placement_screen(player):
         # Draw the grid and label it with letters and numbers
         for i in range(10):
             for j in range(10):
-                pygame.draw.rect(screen, GRID_BLUE, (50 + i * 50, 100 + j * 50, 50, 50))
-                pygame.draw.rect(screen, BLACK, (50 + i * 50, 100 + j * 50, 50, 50), 1)
-                if grid[j][i] is not None:  # If a ship is placed, color it dark gray
+                pygame.draw.rect(screen, GRID_BLUE, (50 + i * 50, 100 + j * 50, 50, 50)) # Draw background
+                pygame.draw.rect(screen, BLACK, (50 + i * 50, 100 + j * 50, 50, 50), 1) # Draw black outlines
+                if grid[j][i] is not None:  # If a ship is placed, draw dark gray over that spot in grid
                     pygame.draw.rect(screen, DARK_GRAY, (50 + i * 50, 100 + j * 50, 50, 50))
                 screen.blit(font.render(chr(65 + i), True, BLACK), (65 + i * 50, 70))
                 screen.blit(font.render(str(j + 1), True, BLACK), (20, 115 + j * 50))
@@ -139,13 +140,16 @@ def placement_screen(player):
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
+                # Rotate button pressed
                 if 600 <= event.pos[0] <= 750 and 600 <= event.pos[1] <= 650:
                     vertical = not vertical
+                # All ships have been placed and the finish button is pressed
                 elif 800 <= event.pos[0] <= 950 and 600 <= event.pos[1] <= 650 and all_ships_placed:
                     finished = True
                 else:
-                    x, y = (event.pos[0] - 50) // 50, (event.pos[1] - 100) // 50
-                    if 0 <= x < 10 and 0 <= y < 10:
+                    x, y = (event.pos[0] - 50) // 50, (event.pos[1] - 100) // 50 # Get grid position of mouse click
+                    if 0 <= x < 10 and 0 <= y < 10: # Check if mouse click is within bounds of grid
+                        # If a ship is selected, check if the placement is valid and place it if so
                         if selected is not None:
                             size = max(ships[selected].width, ships[selected].height) // 50
                             if is_valid_placement(x, y, size, vertical, selected + 1):
@@ -182,7 +186,7 @@ def placement_screen(player):
     else:
         player2_ships = [[1 if cell is not None else None for cell in row] for row in grid]
 
-
+# Transition screen to prevent players from looking at each other's grid
 def pass_screen(player):
     global finished
     finished = False
@@ -195,6 +199,7 @@ def pass_screen(player):
         # Handle events
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN:
+                # Mouse button press when over finish button
                 if 400 <= event.pos[0] <= 550 and 600 <= event.pos[1] <= 650:
                     finished = True
             if event.type == pygame.QUIT:
@@ -208,7 +213,7 @@ def battle_screen(player, opponent_grid, hits_grid):
     global finished
     finished = False
     shot_result = None  # Track if the last shot was a hit or miss
-    attack_made = False  # Track if an attack has been made
+    attack_made = False  # Track if an attack has been made, for preventing multiple attacks in same turn
 
     def check_ship_sunk(x, y):
         if opponent_grid[y][x] != 'H':
@@ -249,7 +254,7 @@ def battle_screen(player, opponent_grid, hits_grid):
                 pygame.draw.rect(screen, GRID_BLUE, (50 + i * 50, 100 + j * 50, 50, 50))
                 pygame.draw.rect(screen, BLACK, (50 + i * 50, 100 + j * 50, 50, 50), 1)
 
-                if hits_grid[j][i] == 'M':  # Missed shot
+                if hits_grid[j][i] == 'M':  # Missed shot, draw white circle
                     pygame.draw.circle(screen, WHITE, (75 + i * 50, 125 + j * 50), 20, 2)
                 elif hits_grid[j][i] == 'H':  # Hit shot
                     if check_ship_sunk(i, j):
@@ -305,6 +310,7 @@ def battle_screen(player, opponent_grid, hits_grid):
     else:
         return 0  # Continue the game
 
+# Game over screen, displays who won and asks to play again
 def winner_screen(player):
     global game_running, restart_game
     screen.fill(WHITE)
@@ -333,9 +339,11 @@ def winner_screen(player):
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
+                # New game button pressed
                 if 300 <= mouse_pos[0] <= 450 and 400 <= mouse_pos[1] <= 450:
                     new_game()
                     return
+                # Quit game button pressed
                 elif 500 <= mouse_pos[0] <= 650 and 400 <= mouse_pos[1] <= 450:
                     end_game()
                     return
