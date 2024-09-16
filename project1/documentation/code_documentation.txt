@@ -42,6 +42,9 @@ position is a valid placement for the held ship.
     The position of the ships is then stored in a two-dimensional list corresponding to the player
     accessible outside the function.
 
+    The position of ships is also stored in a list. Each element of the list is a list containing
+    all coordinates containing the ship. The coordinates are a tuple (x, y).
+
 The pass function is essentially an empty screen with a button prompting the next player to begin
 their turn.
 
@@ -49,8 +52,8 @@ The battle screen accounts for the current player's turn and their opponent's gr
 a 'hits grid' that tracks the cells the player has targeted as well as whether it was a hit
 or a miss.
 
-    The 'check_ship_sunk' function checks surrounding cells to determine if the currently
-    attacked cell results in a sunken ship.
+    The 'check_ship_sunk' function finds the ship that is on the (x, y) coordinates given, and
+    then returns if all cells of that ship have been sunk.
 
     The primary loop within the battle scene starts with drawing the grid, and then checks if each
     cell was hit and draws a white circle for missed attacks, gray squares a ship on the cell

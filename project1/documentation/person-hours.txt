@@ -6,3 +6,5 @@ Ethan Dirkes - 2 hours
 	I read through the code once it was mostly finished and added comments where I thought the code needed more clarification. I also wrote up the code documentation file, detailing the functionality of the code and the process of how the game works. Took around 2 hours in total to interpret code and its functionality and then write about it in detail.
 Tommy Lam - 2 hours
 	I add player grid which also track the opponent attack, additionally I add a function to show if a ship space occupies is fully hit it will sunk which update on the opponent grid from red cross of each cell to fill the space with red. Programming and troubleshooting took around 2 hours.
+Chase Entwistle - 3 hours
+	I started writing the code by creating the global variables that hold the state of the board, and some functions that use those values. I also fixed some bugs near the end, and made the project give better information to the user.
