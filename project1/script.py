@@ -248,6 +248,8 @@ def battle_screen(player, opponent_grid, hits_grid):
             for j in range(10):
                 pygame.draw.rect(screen, GRID_BLUE, (50 + i * 50, 100 + j * 50, 50, 50))
                 pygame.draw.rect(screen, BLACK, (50 + i * 50, 100 + j * 50, 50, 50), 1)
+                screen.blit(font.render(chr(65 + i), True, BLACK), (65 + i * 50, 70))
+                screen.blit(font.render(str(j + 1), True, BLACK), (20, 115 + j * 50))
 
                 if hits_grid[j][i] == 'M':  # Missed shot
                     pygame.draw.circle(screen, WHITE, (75 + i * 50, 125 + j * 50), 20, 2)
@@ -257,6 +259,16 @@ def battle_screen(player, opponent_grid, hits_grid):
                     else:
                         pygame.draw.line(screen, RED, (60 + i * 50, 110 + j * 50), (90 + i * 50, 140 + j * 50), 3)
                         pygame.draw.line(screen, RED, (90 + i * 50, 110 + j * 50), (60 + i * 50, 140 + j * 50), 3)
+        
+        # Draw player's own grid
+        for i in range(10):
+            for j in range(10):
+                pygame.draw.rect(screen, LIGHT_BLUE, (600 + i * 30, 100 + j * 30, 30, 30))
+                pygame.draw.rect(screen, BLACK, (600 + i * 30, 100 + j * 30, 30, 30), 1)
+                if player == 1 and player1_ships[j][i] is not None:
+                    pygame.draw.rect(screen, DARK_GRAY, (600 + i * 30, 100 + j * 30, 30, 30))
+                elif player == 2 and player2_ships[j][i] is not None:
+                    pygame.draw.rect(screen, DARK_GRAY, (600 + i * 30, 100 + j * 30, 30, 30))
 
         # Show the result of the last shot
         if shot_result:
