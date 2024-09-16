@@ -1,0 +1,69 @@
+--CODE DOCUMENTATION--
+
+The 'main' function (at the bottom of script.py) of the program runs the game, storing information
+unique to each match such as position of each player's ships and the state of the game. The loop
+inside of the main function begins the game and transitions between different states of the game,
+from placementto passing to attacking, and then asks if the players would like to play again,
+breaking out of the main loop and thus terminating the program.
+
+There is a function for drawing buttons, taking the text to display on the button, the X and Y
+coordinates to display the button, the width and height of the button, the color, and optional
+parameters for setting the action associated with the button (what function to execute) and
+whether the button should be disabled.
+
+The start screen is the first scene called in the main loop. This screen displays a series
+of buttons labeled '1' to '5' which corresponds to the number of ships the players
+choose to play with.
+
+The next scene is the placement screen for the first player. The positions of the ships for
+each player is stored in a two-dimensional list. There are functions within the placement screen
+for removing a ship from the screen once it is "picked up" and for checking if the current
+position is a valid placement for the held ship.
+
+    The ships are first drawn in the sidebar, ready to be placed on the grid. Buttons are drawn
+    for rotating the ship (toggle between horizontal/vertical) and for submitting the placement
+    of the ships once they are all placed. If a ship is held, a red outline is drawn signifying
+    the size of the currently held ship.
+
+    Events are polled and if a mouse click is detected, the following are checked:
+        - If over the rotate button, invert the 'vertical' variable denoting the orientation
+        of the ship.
+        - If over the 'finished' button, toggle the 'finished' variable and exit the loop,
+        denoting the end of the player's placement.
+        - Otherwise, enter process of placing/picking up ship.
+    
+    The grid position of the mouse is stored and then checked if it is within the bounds
+    of the grid. If so, if the player is currently holding a ship, and the placement is valid,
+    the position of the ship is stored and drawn to the grid. If the player is not holding a ship,
+    the game checks if the mouse is touching a ship already on screen, and picks it up if so,
+    clearing it from the screen. If the mouse is not on the grid, the game checks if the mouse is
+    touching an unplaced ship in the sidebar.
+
+    The position of the ships is then stored in a two-dimensional list corresponding to the player
+    accessible outside the function.
+
+The pass function is essentially an empty screen with a button prompting the next player to begin
+their turn.
+
+The battle screen accounts for the current player's turn and their opponent's grid, as well as
+a 'hits grid' that tracks the cells the player has targeted as well as whether it was a hit
+or a miss.
+
+    The 'check_ship_sunk' function checks surrounding cells to determine if the currently
+    attacked cell results in a sunken ship.
+
+    The primary loop within the battle scene starts with drawing the grid, and then checks if each
+    cell was hit and draws a white circle for missed attacks, gray squares a ship on the cell
+    has been sunk, or a red 'X' if the cell is a hit but the ship hasn't been sunk yet.
+
+    The loop then checks for if a mouse click occurs over the grid and if the spot on the grid
+    has been targeted already. If the check passes, it is then determined if the attack was a 
+    hit (storing an 'H' in the grid) or a miss (storing an 'M' in the grid). The player is then
+    locked out of further attacks and is only able to press the 'finished' button to begin the
+    other player's turn.
+
+    After the battle loop, the game then checks if all the ships have been sunk, and returns the
+    winner of the game.
+
+The next scene is the game over screen (winner_screen), displaying which player won the game
+and prompting the players to either play again (new game) or exit (quit game).

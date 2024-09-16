@@ -2,3 +2,5 @@ Christopher Gronewold - 3 hours
 	We split the project into sections that each of us programmed. I covered the screens where you select the number of ships to play with as well as the screens for ship placement. Programming this as well as collaborating with the other team members took around 3 hours.
 Zonaid Prithu - 2 hours
 	I built off of the developed grid functionality and created a way for shots to be registered and for the game to detect a winner, additionally, I made a win screen that allows the user to reset the game and play again or to end the game. Programming and troubleshooting took 2 hours.
+Ethan Dirkes - 2 hours
+	I read through the code once it was mostly finished and added comments where I thought the code needed more clarification. I also wrote up the code documentation file, detailing the functionality of the code and the process of how the game works. Took around 2 hours in total to interpret code and its functionality and then write about it in detail.
