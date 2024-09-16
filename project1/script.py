@@ -209,7 +209,7 @@ def pass_screen(player):
         pygame.display.flip()
 
 
-def battle_screen(player, opponent_grid, hits_grid):
+def battle_screen(player, opponent_grid, hits_grid, player_grid):
     global finished
     finished = False
     shot_result = None  # Track if the last shot was a hit or miss
@@ -260,7 +260,7 @@ def battle_screen(player, opponent_grid, hits_grid):
                     pygame.draw.circle(screen, WHITE, (75 + i * 50, 125 + j * 50), 20, 2)
                 elif hits_grid[j][i] == 'H':  # Hit shot
                     if check_ship_sunk(i, j):
-                        pygame.draw.rect(screen, DARK_GRAY, (50 + i * 50, 100 + j * 50, 50, 50))
+                        pygame.draw.rect(screen, RED, (50 + i * 50, 100 + j * 50, 50, 50))
                     else:
                         pygame.draw.line(screen, RED, (60 + i * 50, 110 + j * 50), (90 + i * 50, 140 + j * 50), 3)
                         pygame.draw.line(screen, RED, (90 + i * 50, 110 + j * 50), (60 + i * 50, 140 + j * 50), 3)
@@ -270,10 +270,14 @@ def battle_screen(player, opponent_grid, hits_grid):
             for j in range(10):
                 pygame.draw.rect(screen, LIGHT_BLUE, (600 + i * 30, 100 + j * 30, 30, 30))
                 pygame.draw.rect(screen, BLACK, (600 + i * 30, 100 + j * 30, 30, 30), 1)
-                if player == 1 and player1_ships[j][i] is not None:
+                
+                if player_grid[j][i] == 1:  # Ship
                     pygame.draw.rect(screen, DARK_GRAY, (600 + i * 30, 100 + j * 30, 30, 30))
-                elif player == 2 and player2_ships[j][i] is not None:
-                    pygame.draw.rect(screen, DARK_GRAY, (600 + i * 30, 100 + j * 30, 30, 30))
+                elif player_grid[j][i] == 'M':  # Missed attack by opponent
+                    pygame.draw.circle(screen, WHITE, (615 + i * 30, 115 + j * 30), 12, 2)
+                elif player_grid[j][i] == 'H':  # Hit attack by opponent
+                    pygame.draw.line(screen, RED, (605 + i * 30, 105 + j * 30), (625 + i * 30, 125 + j * 30), 2)
+                    pygame.draw.line(screen, RED, (625 + i * 30, 105 + j * 30), (605 + i * 30, 125 + j * 30), 2)
 
         # Show the result of the last shot
         if shot_result:
@@ -395,12 +399,12 @@ def main():
         # Start the battle
         winner = 0
         while winner == 0:
-            winner = battle_screen(1, player2_ships, player1_hits)  # Player 1 attacks Player 2
+            winner = battle_screen(1, player2_ships, player1_hits, player1_ships)  # Player 1 attacks Player 2
             if winner:
                 break
             pass_screen(2)
 
-            winner = battle_screen(2, player1_ships, player2_hits)  # Player 2 attacks Player 1
+            winner = battle_screen(2, player1_ships, player2_hits, player2_ships)  # Player 2 attacks Player 1
             if winner:
                 break
             pass_screen(1)
