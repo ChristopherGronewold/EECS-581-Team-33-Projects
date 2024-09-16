@@ -3,3 +3,4 @@
 9/10 - team meeting (20 minutes)
 9/14 - Creation of End screen and attack system by Zonaid Prithu (2 hours)
 9/14 - Debugging code by Christopher Gronewold (30 minutes)
+9/15 - Commenting and documentation by Ethan Dirkes (2 hours)
