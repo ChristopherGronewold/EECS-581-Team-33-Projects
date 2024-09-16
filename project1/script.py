@@ -139,6 +139,12 @@ def placement_screen(player):
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+            #Use key h or v to rotate
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_h:
+                    vertical = True
+                elif event.key == pygame.K_v:
+                    vertical = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 # Rotate button pressed
                 if 600 <= event.pos[0] <= 750 and 600 <= event.pos[1] <= 650:
