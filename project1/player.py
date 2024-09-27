@@ -1,8 +1,10 @@
 class Player:
     def __init__(self, player_id):
         self.player_id = player_id
+        self.ships = None
         self.sunk_ships = []
         self.hits = []
+        self.attack_grid = [[None for _ in range(10)] for _ in range(10)]
 
     def all_ships_sunk(self, player_ships):
         return all(self.check_ship_sunk(ship) for ship in player_ships)
