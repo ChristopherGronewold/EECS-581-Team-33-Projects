@@ -23,18 +23,26 @@ Creation date: 9/6/2024
 import pygame
 import sys
 from player import Player
+from start_screen import StartScreen
+from battle_screen import BattleScreen
+from pass_screen import PassScreen
+from placement_screen import PlacementScreen
+from win_screen import WinScreen
 
 # Initialize Pygame and set up the display
 pygame.init()
-screen = pygame.display.set_mode((1000, 750))  # Create a 1000x750 pixel window
-font = pygame.font.Font(None, 36)  # Set up a default font for text rendering
+#screen = pygame.display.set_mode((1000, 750))  # Create a 1000x750 pixel window
+#font = pygame.font.Font(None, 36)  # Set up a default font for text rendering
 
 # Game Parameters
+
 gameParams = {
     "finished": False,
     "num_ships": 0,
     "player1" : Player(1),
     "player2" : Player(2),
+    "screen" : pygame.display.set_mode((1000, 750)), #1000x750 pixel window
+    "font" : pygame.font.Font(None,36), #Default font for text
 }
 
 
@@ -94,10 +102,11 @@ def main():
             continue
 
         # Start screen to select number of ships
-        start_screen()
+        startScreen = StartScreen(gameParams, colorDict)
+        startScreen.display()
         # Initialize hit grids for both players
-        player1_hits = [[None] * 10 for _ in range(10)]
-        player2_hits = [[None] * 10 for _ in range(10)]
+        #player1_hits = [[None] * 10 for _ in range(10)]
+        #player2_hits = [[None] * 10 for _ in range(10)]
 
         # Ship placement for both players
         placement_screen(1)

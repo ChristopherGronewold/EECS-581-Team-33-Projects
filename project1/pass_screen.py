@@ -22,10 +22,10 @@ class PassScreen:
 
             self.screen.fill(self.colors["WHITE"])  # Clear screen
             # Display pass instruction
-            text = self.font.render(f"Pass to player {player}", True, BLACK)
+            text = self.font.render(f"Pass to player {player}", True, self.colors["BLACK"])
             self.screen.blit(text, (350, 20))
             # Draw finish button
-            button.draw("Finish", 400, 600, 150, 50, LIGHT_GRAY, lambda: globals().update(finished=True))
+            button.draw("Finish", 400, 600, 150, 50, self.colors["LIGHT_GRAY"], lambda: globals().update(finished=True))
 
             for event in pygame.event.get():
                 if event.type == pygame.MOUSEBUTTONDOWN:

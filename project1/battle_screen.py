@@ -55,7 +55,7 @@ class BattleScreen:
             # Draw opponent's grid (for attacks)
             for i in range(10):
                 for j in range(10):
-                    pygame.draw.rect(screen, GRID_BLUE, (50 + i * 50, 100 + j * 50, 50, 50))
+                    pygame.draw.rect(self.gameParams["screen"], GRID_BLUE, (50 + i * 50, 100 + j * 50, 50, 50))
                     pygame.draw.rect(screen, BLACK, (50 + i * 50, 100 + j * 50, 50, 50), 1)
                     screen.blit(font.render(chr(65 + i), True, BLACK), (65 + i * 50, 70))
                     screen.blit(font.render(str(j + 1), True, BLACK), (20, 115 + j * 50))

@@ -12,15 +12,15 @@ class WinScreen:
         self.colors = colors
         self.gameParams = gameParams
     
-    def new_game():
+    def new_game(self):
         global restart_game
         restart_game = True
 
-    def end_game():
+    def end_game(self):
         global game_running
         game_running = False
 
-    def winner_screen(self, player):
+    def display(self, player):
         """
         Display the winner screen and options for a new game or to end the game.
 
@@ -34,8 +34,8 @@ class WinScreen:
         self.screen.blit(text, (350, 200))
 
     # Draw new game and end game buttons
-        newGameButton = Button("New Game", 300, 400, 150, 50, self.colors["LIGHT_GRAY"], action=new_game)
-        endGameButton = Button("End Game", 500, 400, 150, 50, self.colors["LIGHT_GRAY"], action=end_game)
+        newGameButton = Button("New Game", 300, 400, 150, 50, self.colors["LIGHT_GRAY"], action=self.new_game)
+        endGameButton = Button("End Game", 500, 400, 150, 50, self.colors["LIGHT_GRAY"], action=self.end_game)
 
         newGameButton.draw(self.screen, self.font)
         endGameButton.draw(self.screen, self.font)
@@ -47,11 +47,21 @@ class WinScreen:
                     sys.exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse_pos = pygame.mouse.get_pos()
-                    if 300 <= mouse_pos[0] <= 450 and 400 <= mouse_pos[1] <= 450:
-                        new_game()
+
+                    if newGameButton.click(mouse_pos):
+                        self.new_game()
                         return
-                    elif 500 <= mouse_pos[0] <= 650 and 400 <= mouse_pos[1] <= 450:
-                        end_game()
+                    elif endGameButton.click(mouse_pos):
+                        self.end_game()
                         return
 
+                '''
+                if 300 <= mouse_pos[0] <= 450 and 400 <= mouse_pos[1] <= 450:
+                    new_game()
+                    return
+                
+                elif 500 <= mouse_pos[0] <= 650 and 400 <= mouse_pos[1] <= 450:
+                    end_game()
+                    return
+                '''
         pygame.display.flip()  # Update the display
